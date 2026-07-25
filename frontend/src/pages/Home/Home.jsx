@@ -1,18 +1,17 @@
-import Hero from "../../components/home/Hero";
-import HowItWorks from "../../components/home/HowItWorks";
-import Statistics from "../../components/home/Statistics";
 import Navbar from "../../components/layout/Navbar";
+import Hero from "../../components/home/Hero";
+import Features from "../../components/home/Features";
+import HowItWorks from "../../components/home/HowItWorks";
 
 function Home() {
   return (
-    <div className="bg-slate-950 min-h-screen text-white">
+    <>
       <Navbar />
       <Hero />
-      <Statistics />
+      <Features />
       <HowItWorks />
-    </div>
+    </>
   );
 }
 
 export default Home;
-

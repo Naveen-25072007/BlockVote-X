@@ -1,64 +1,53 @@
 function HowItWorks() {
   const steps = [
     {
-      step: "01",
+      number: "1",
       title: "Register",
-      description:
-        "The voter securely registers using a unique ID and authentication.",
+      description: "Students register using their college details.",
     },
     {
-      step: "02",
-      title: "Verify Identity",
-      description:
-        "The system verifies voter eligibility before allowing access.",
+      number: "2",
+      title: "Verify",
+      description: "Admin verifies the student's identity.",
     },
     {
-      step: "03",
-      title: "Cast Vote",
-      description:
-        "The vote is encrypted and recorded on the blockchain through a smart contract.",
+      number: "3",
+      title: "Vote",
+      description: "Students cast their vote securely using blockchain.",
     },
     {
-      step: "04",
-      title: "Verify Results",
-      description:
-        "Anyone can verify election integrity without revealing voter identities.",
+      number: "4",
+      title: "Results",
+      description: "Votes are counted instantly and transparently.",
     },
   ];
 
   return (
-    <section className="bg-slate-950 py-24">
-      <div className="max-w-7xl mx-auto px-6">
-
-        <h2 className="text-5xl font-bold text-center text-white">
-          How BlockVote X Works
+    <section className="py-20 bg-white">
+      <div className="max-w-6xl mx-auto px-6">
+        <h2 className="text-4xl font-bold text-center mb-14">
+          How It Works
         </h2>
 
-        <p className="text-center text-gray-400 mt-5">
-          Four simple steps to conduct a secure blockchain election.
-        </p>
-
-        <div className="grid md:grid-cols-4 gap-8 mt-16">
-
+        <div className="grid md:grid-cols-4 gap-8">
           {steps.map((step) => (
             <div
-              key={step.step}
-              className="bg-slate-900 border border-slate-800 rounded-2xl p-8 hover:border-blue-500 transition duration-300"
+              key={step.number}
+              className="text-center border rounded-xl p-6 shadow-sm hover:shadow-md transition"
             >
-              <div className="text-5xl font-bold text-blue-500 mb-6">
-                {step.step}
+              <div className="w-14 h-14 mx-auto rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-bold mb-4">
+                {step.number}
               </div>
 
-              <h3 className="text-2xl font-semibold text-white">
+              <h3 className="text-xl font-semibold mb-3">
                 {step.title}
               </h3>
 
-              <p className="text-gray-400 mt-4">
+              <p className="text-gray-600">
                 {step.description}
               </p>
             </div>
           ))}
-
         </div>
       </div>
     </section>

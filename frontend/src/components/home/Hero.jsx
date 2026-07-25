@@ -1,36 +1,30 @@
 function Hero() {
   return (
-    <section className="min-h-screen flex items-center justify-center px-6">
-
-      <div className="text-center max-w-4xl">
-
-        <p className="text-blue-400 font-semibold tracking-widest uppercase">
+    <section className="py-20 px-6 bg-gray-100">
+      <div className="max-w-4xl mx-auto text-center">
+        <p className="text-blue-600 font-semibold uppercase">
           Blockchain Powered Voting
         </p>
 
-        <h1 className="text-6xl md:text-7xl font-extrabold mt-6 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        <h1 className="text-6xl font-bold text-black mt-6">
           BlockVote X
         </h1>
 
-        <p className="mt-8 text-xl text-gray-400">
+        <p className="text-gray-700 mt-6 text-xl">
           Secure, Transparent and Tamper-Proof Digital Voting
           using Blockchain Technology.
         </p>
 
-        <div className="flex justify-center gap-6 mt-10">
-
-          <button className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-xl font-semibold">
+        <div className="mt-10 flex justify-center gap-4">
+          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg">
             Get Started
           </button>
 
-          <button className="border border-gray-500 hover:border-white px-8 py-3 rounded-xl">
+          <button className="border border-black px-6 py-3 rounded-lg">
             Learn More
           </button>
-
         </div>
-
       </div>
-
     </section>
   );
 }
