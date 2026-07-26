@@ -1,4 +1,9 @@
+import { Link } from "react-router-dom";
+import { useElection } from "../../context/ElectionContext";
+
 function Student() {
+  const { elections } = useElection();
+
   return (
     <div className="min-h-screen bg-slate-100">
 
@@ -20,37 +25,73 @@ function Student() {
           Available Elections
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        {elections.length === 0 ? (
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-xl font-semibold">
-              Student Council Election 2026
+          <div className="bg-white rounded-xl shadow p-8 text-center">
+            <h3 className="text-2xl font-bold">
+              No Elections Available
             </h3>
 
             <p className="text-gray-600 mt-3">
-              Vote for your Student Council President.
+              The administrator has not created any elections yet.
             </p>
-
-            <button className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-              Cast Vote
-            </button>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-xl font-semibold">
-              Club Representative Election
-            </h3>
+        ) : (
 
-            <p className="text-gray-600 mt-3">
-              Elect your club representative.
-            </p>
+          <div className="grid md:grid-cols-2 gap-6">
 
-            <button className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-              Cast Vote
-            </button>
+            {elections.map((election) => (
+
+              <div
+                key={election.id}
+                className="bg-white rounded-xl shadow p-6"
+              >
+                <h3 className="text-xl font-bold">
+                  {election.title}
+                </h3>
+
+                <p className="text-gray-600 mt-3">
+                  {election.description}
+                </p>
+
+                <div className="mt-4 space-y-2">
+
+                  <p>
+                    <strong>Status:</strong> {election.status}
+                  </p>
+
+                  <p>
+                    <strong>Candidates:</strong>{" "}
+                    {election.candidates.length}
+                  </p>
+
+                  <p>
+                    <strong>Start:</strong>{" "}
+                    {election.startDate}
+                  </p>
+
+                  <p>
+                    <strong>End:</strong>{" "}
+                    {election.endDate}
+                  </p>
+
+                </div>
+
+                <Link
+                  to={`/student/election/${election.id}`}
+                  className="inline-block mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+                >
+                  Vote Now
+                </Link>
+
+              </div>
+
+            ))}
+
           </div>
 
-        </div>
+        )}
 
       </div>
 
