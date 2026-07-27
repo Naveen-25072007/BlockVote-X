@@ -3,7 +3,6 @@ import { useElection } from "../../context/ElectionContext";
 
 function Admin() {
   const navigate = useNavigate();
-
   const { elections } = useElection();
 
   // Statistics
@@ -31,124 +30,175 @@ function Admin() {
   const menuItems = [
     {
       title: "Create Election",
-      description: "Create a new election",
+      description: "Create a new election.",
       route: "/admin/create-election",
-      color: "bg-blue-600",
     },
     {
       title: "Manage Elections",
-      description: "View and manage elections",
+      description: "View and manage elections.",
       route: "/admin/elections",
-      color: "bg-green-600",
-    },
-    {
-      title: "Candidates",
-      description: "Manage election candidates",
-      route: "/admin/elections",
-      color: "bg-purple-600",
     },
     {
       title: "Verify Students",
-      description: "Approve eligible voters",
+      description: "Approve eligible voters.",
       route: "/admin/verify-students",
-      color: "bg-yellow-500",
     },
     {
       title: "Results",
-      description: "View live election results",
+      description: "View live election results.",
       route: "/admin/results",
-      color: "bg-pink-600",
-    },
-    {
-      title: "Settings",
-      description: "System configuration",
-      route: "#",
-      color: "bg-gray-700",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-10 px-6">
+      <div className="max-w-6xl mx-auto space-y-10">
 
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <h1 className="text-4xl font-bold text-slate-800">
+        <div className="bg-white border border-gray-200 rounded-xl p-8">
+          <h1 className="text-3xl font-bold text-gray-900">
             Admin Dashboard
           </h1>
 
           <p className="text-gray-600 mt-2">
-            Manage elections, candidates, students, and results.
+            Manage elections, candidates, students and monitor voting activity.
           </p>
         </div>
 
         {/* Statistics */}
-        <div className="grid md:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-          <div className="bg-blue-600 text-white p-6 rounded-xl shadow">
-            <h2 className="text-lg font-semibold">
-              Elections
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <h2 className="text-sm font-medium uppercase text-gray-500">
+              Total Elections
             </h2>
-
-            <p className="text-4xl font-bold mt-2">
+            <p className="text-3xl font-bold text-gray-900 mt-3">
               {totalElections}
             </p>
           </div>
 
-          <div className="bg-green-600 text-white p-6 rounded-xl shadow">
-            <h2 className="text-lg font-semibold">
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <h2 className="text-sm font-medium uppercase text-gray-500">
               Candidates
             </h2>
-
-            <p className="text-4xl font-bold mt-2">
+            <p className="text-3xl font-bold text-gray-900 mt-3">
               {totalCandidates}
             </p>
           </div>
 
-          <div className="bg-yellow-500 text-white p-6 rounded-xl shadow">
-            <h2 className="text-lg font-semibold">
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <h2 className="text-sm font-medium uppercase text-gray-500">
               Active Elections
             </h2>
-
-            <p className="text-4xl font-bold mt-2">
+            <p className="text-3xl font-bold text-gray-900 mt-3">
               {activeElections}
             </p>
           </div>
 
-          <div className="bg-pink-600 text-white p-6 rounded-xl shadow">
-            <h2 className="text-lg font-semibold">
-              Votes
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <h2 className="text-sm font-medium uppercase text-gray-500">
+              Total Votes
             </h2>
-
-            <p className="text-4xl font-bold mt-2">
+            <p className="text-3xl font-bold text-gray-900 mt-3">
               {totalVotes}
             </p>
           </div>
 
         </div>
 
-        {/* Menu */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Quick Actions */}
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+            Quick Actions
+          </h2>
 
-          {menuItems.map((item) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <div
-              key={item.title}
-              onClick={() =>
-                item.route !== "#" &&
-                navigate(item.route)
-              }
-              className={`${item.color} text-white rounded-xl p-6 shadow-lg cursor-pointer hover:scale-105 transition duration-300`}
-            >
-              <h2 className="text-2xl font-bold mb-3">
-                {item.title}
-              </h2>
+            {menuItems.map((item) => (
+              <div
+                key={item.title}
+                className="bg-white border border-gray-200 rounded-xl p-6"
+              >
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {item.title}
+                </h3>
 
-              <p>{item.description}</p>
+                <p className="text-gray-600 mt-2">
+                  {item.description}
+                </p>
 
+                <button
+                  onClick={() => navigate(item.route)}
+                  className="mt-6 px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                >
+                  Open
+                </button>
+              </div>
+            ))}
+
+          </div>
+        </div>
+
+        {/* Recent Elections */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+            Recent Elections
+          </h2>
+
+          {elections.length === 0 ? (
+            <p className="text-gray-500">
+              No elections have been created yet.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 font-semibold">Election</th>
+                    <th className="text-left py-3 font-semibold">Status</th>
+                    <th className="text-left py-3 font-semibold">Candidates</th>
+                    <th className="text-left py-3 font-semibold">Action</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {elections.map((election) => (
+                    <tr
+                      key={election.id}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="py-4">
+                        {election.title}
+                      </td>
+
+                      <td className="py-4">
+                        {election.status}
+                      </td>
+
+                      <td className="py-4">
+                        {election.candidates.length}
+                      </td>
+
+                      <td className="py-4">
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/election/${election.id}`)
+                          }
+                          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+
+                </tbody>
+
+              </table>
             </div>
-
-          ))}
+          )}
 
         </div>
 
