@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 
+// =============================
+// Candidate Schema
+// =============================
 const candidateSchema = new mongoose.Schema(
   {
     name: {
@@ -10,23 +13,33 @@ const candidateSchema = new mongoose.Schema(
 
     party: {
       type: String,
-      default: "",
+      required: true,
       trim: true,
+    },
+
+    image: {
+      type: String,
+      default: "",
+    },
+
+    manifesto: {
+      type: String,
+      default: "",
     },
 
     votes: {
       type: Number,
       default: 0,
     },
-
-    photo: {
-      type: String,
-      default: "",
-    },
   },
-  { _id: true }
+  {
+    _id: true, // Each candidate gets its own ObjectId
+  }
 );
 
+// =============================
+// Election Schema
+// =============================
 const electionSchema = new mongoose.Schema(
   {
     title: {
@@ -37,7 +50,8 @@ const electionSchema = new mongoose.Schema(
 
     description: {
       type: String,
-      default: "",
+      required: true,
+      trim: true,
     },
 
     startDate: {
@@ -52,7 +66,7 @@ const electionSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Upcoming", "Active", "Completed"],
+      enum: ["Upcoming", "Active", "Ended"],
       default: "Upcoming",
     },
 
@@ -61,6 +75,7 @@ const electionSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
   },
   {
