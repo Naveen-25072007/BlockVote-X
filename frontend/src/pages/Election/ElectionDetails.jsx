@@ -79,90 +79,118 @@ function ElectionDetails() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-6">
+    <div className="min-h-screen bg-slate-950 py-10 px-6">
 
-      <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8">
+      <div className="max-w-6xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-8 text-white">
 
         {/* Header */}
 
-        <div className="flex justify-between items-center mb-8">
+       {/* Header */}
 
-          <div>
+<div className="rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-700 p-8 mb-8 shadow-xl">
 
-            {isEditing ? (
+  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
 
-              <input
-                type="text"
-                value={editData.title}
-                onChange={(e) =>
-                  setEditData({
-                    ...editData,
-                    title: e.target.value,
-                  })
-                }
-                className="border rounded-lg px-4 py-2 w-full text-3xl font-bold"
-              />
+    <div>
 
-            ) : (
+      {isEditing ? (
 
-              <h1 className="text-3xl font-bold">
-                {election.title}
-              </h1>
+        <input
+          type="text"
+          value={editData.title}
+          onChange={(e) =>
+            setEditData({
+              ...editData,
+              title: e.target.value,
+            })
+          }
+          className="w-full rounded-xl bg-white/20 px-5 py-3 text-4xl font-bold text-white placeholder-white outline-none"
+        />
 
-            )}
+      ) : (
 
-          </div>
+        <h1 className="text-4xl font-bold">
+          {election.title}
+        </h1>
 
-          <div className="space-x-3">
+      )}
 
-            {isEditing ? (
-              <>
-                <button
-                  onClick={handleSave}
-                  className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700"
-                >
-                  Save
-                </button>
+      <p className="mt-3 text-cyan-100">
+        Blockchain Verified Election
+      </p>
 
-                <button
-                  onClick={() => {
-                    setEditData({
-                      title: election.title,
-                      description: election.description,
-                      startDate: election.startDate,
-                      endDate: election.endDate,
-                    });
+      <div className="mt-5 flex flex-wrap gap-3">
 
-                    setIsEditing(false);
-                  }}
-                  className="bg-gray-500 text-white px-5 py-2 rounded-lg hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-yellow-500 text-white px-5 py-2 rounded-lg hover:bg-yellow-600"
-                >
-                  Edit
-                </button>
+        <span
+          className={`rounded-full px-4 py-2 text-sm font-semibold ${
+            election.status === "Active"
+              ? "bg-green-500/20 text-green-200"
+              : election.status === "Upcoming"
+              ? "bg-yellow-500/20 text-yellow-100"
+              : "bg-red-500/20 text-red-200"
+          }`}
+        >
+          {election.status}
+        </span>
 
-                <button
-                  onClick={() =>
-                    setShowDeleteDialog(true)
-                  }
-                  className="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700"
-                >
-                  Delete
-                </button>
-              </>
-            )}
+        <span className="rounded-full bg-white/20 px-4 py-2 text-sm">
+          {election.candidates.length} Candidates
+        </span>
 
-          </div>
+      </div>
 
-        </div>
+    </div>
+
+    <div className="flex gap-3">
+
+      {isEditing ? (
+        <>
+          <button
+            onClick={handleSave}
+            className="rounded-xl bg-green-500 px-6 py-3 font-semibold hover:bg-green-600 transition"
+          >
+            Save
+          </button>
+
+          <button
+            onClick={() => {
+              setEditData({
+                title: election.title,
+                description: election.description,
+                startDate: election.startDate,
+                endDate: election.endDate,
+              });
+
+              setIsEditing(false);
+            }}
+            className="rounded-xl bg-slate-700 px-6 py-3 font-semibold hover:bg-slate-600 transition"
+          >
+            Cancel
+          </button>
+        </>
+      ) : (
+        <>
+          <button
+            onClick={() => setIsEditing(true)}
+            className="rounded-xl bg-yellow-500 px-6 py-3 font-semibold hover:bg-yellow-600 transition"
+          >
+            Edit
+          </button>
+
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            className="rounded-xl bg-red-600 px-6 py-3 font-semibold hover:bg-red-700 transition"
+          >
+            Delete
+          </button>
+        </>
+      )}
+
+    </div>
+
+  </div>
+
+</div>
 
         {/* Description */}
 
@@ -182,7 +210,7 @@ function ElectionDetails() {
 
         ) : (
 
-          <p className="text-gray-700 mb-6">
+          <p className="text-slate-300 mb-6 leading-7">
             {election.description}
           </p>
 
@@ -192,7 +220,7 @@ function ElectionDetails() {
 
         <div className="grid md:grid-cols-3 gap-5 mb-8">
 
-          <div className="bg-gray-100 rounded-xl p-5">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
 
             <p className="font-semibold mb-2">
               Start Date
@@ -208,7 +236,7 @@ function ElectionDetails() {
                     startDate: e.target.value,
                   })
                 }
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
               />
             ) : (
               <p>
@@ -218,7 +246,7 @@ function ElectionDetails() {
 
           </div>
 
-          <div className="bg-gray-100 rounded-xl p-5">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
 
             <p className="font-semibold mb-2">
               End Date
@@ -234,7 +262,7 @@ function ElectionDetails() {
                     endDate: e.target.value,
                   })
                 }
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
               />
             ) : (
               <p>
@@ -244,7 +272,7 @@ function ElectionDetails() {
 
           </div>
 
-          <div className="bg-gray-100 rounded-xl p-5">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
 
             <p className="font-semibold mb-2">
               Status
@@ -258,7 +286,7 @@ function ElectionDetails() {
                   e.target.value
                 )
               }
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white"
             >
               <option>Upcoming</option>
               <option>Active</option>
@@ -283,7 +311,7 @@ function ElectionDetails() {
               placeholder="Candidate Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="border rounded-lg px-4 py-3"
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white"
             />
 
             <input
@@ -291,14 +319,14 @@ function ElectionDetails() {
               placeholder="Party Name"
               value={party}
               onChange={(e) => setParty(e.target.value)}
-              className="border rounded-lg px-4 py-3"
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white"
             />
 
           </div>
 
           <button
             onClick={handleAddCandidate}
-            className="mt-5 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+            className="mt-5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 hover:scale-105 transition"
           >
             Add Candidate
           </button>
@@ -315,7 +343,7 @@ function ElectionDetails() {
 
           {election.candidates.length === 0 ? (
 
-            <div className="bg-gray-50 border rounded-xl p-6 text-center text-gray-500">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 text-center text-slate-400">
               No candidates added yet.
             </div>
 

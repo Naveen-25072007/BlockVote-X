@@ -1,14 +1,28 @@
-import { MongoClient } from "mongodb";
+import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const client = new MongoClient(process.env.MONGODB_URI);
+console.log("Node Version:", process.version);
+console.log("MongoDB URI:", process.env.MONGODB_URI);
 
-try {
-  await client.connect();
-  console.log("✅ Native MongoDB Driver Connected!");
-  await client.close();
-} catch (err) {
-  console.error(err);
+async function testConnection() {
+  try {
+    console.log("🔄 Connecting to MongoDB...");
+
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000,
+    });
+
+    console.log("✅ MongoDB Connected Successfully!");
+    process.exit(0);
+  } catch (err) {
+    console.error("❌ Connection Failed");
+    console.error("Name:", err.name);
+    console.error("Message:", err.message);
+    console.error(err);
+    process.exit(1);
+  }
 }
+
+testConnection();

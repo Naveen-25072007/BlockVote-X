@@ -1,5 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 
+// Route Protection
+import ProtectedRoute from "./routes/ProtectedRoute";
+import AdminRoute from "./routes/AdminRoute";
+import StudentRoute from "./routes/StudentRoute";
+
 // Home
 import Home from "./pages/Home/Home";
 
@@ -28,11 +33,12 @@ import ElectionDetails from "./pages/Election/ElectionDetails";
 import Results from "./pages/Results/Results";
 
 // Verify Students
-import VerifyStudent from "./pages/VerifyStudent/VerifyStudent";
+import VerifyStudent from "./pages/Student/VerifyStudent/VerifyStudent";
 
 function App() {
   return (
     <Routes>
+
       {/* Home */}
       <Route path="/" element={<Home />} />
 
@@ -40,46 +46,157 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Student */}
-      <Route path="/student" element={<Student />} />
+      {/* ========================= */}
+      {/* Student Routes */}
+      {/* ========================= */}
+
+      <Route
+        path="/student"
+        element={
+          <ProtectedRoute>
+            <StudentRoute>
+              <Student />
+            </StudentRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/student/dashboard"
+        element={
+          <ProtectedRoute>
+            <StudentRoute>
+              <Dashboard />
+            </StudentRoute>
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/student/election/:id"
-        element={<StudentElectionDetails />}
+        element={
+          <ProtectedRoute>
+            <StudentRoute>
+              <StudentElectionDetails />
+            </StudentRoute>
+          </ProtectedRoute>
+        }
       />
-      <Route path="/student/dashboard" element={<Dashboard />} />
-      <Route path="/student/history" element={<History />} />
-      <Route path="/student/profile" element={<Profile />} />
-      <Route path="/student/vote" element={<Vote />} />
-      <Route path="/student/results" element={<StudentResults />} />
 
-      {/* Admin */}
-      <Route path="/admin" element={<Admin />} />
+      <Route
+        path="/student/history"
+        element={
+          <ProtectedRoute>
+            <StudentRoute>
+              <History />
+            </StudentRoute>
+          </ProtectedRoute>
+        }
+      />
 
-      {/* Election */}
+      <Route
+        path="/student/profile"
+        element={
+          <ProtectedRoute>
+            <StudentRoute>
+              <Profile />
+            </StudentRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/student/vote"
+        element={
+          <ProtectedRoute>
+            <StudentRoute>
+              <Vote />
+            </StudentRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/student/results"
+        element={
+          <ProtectedRoute>
+            <StudentRoute>
+              <StudentResults />
+            </StudentRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ========================= */}
+      {/* Admin Routes */}
+      {/* ========================= */}
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/admin/create-election"
-        element={<CreateElection />}
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <CreateElection />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
       />
+
       <Route
         path="/admin/elections"
-        element={<ElectionList />}
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <ElectionList />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
       />
+
       <Route
         path="/admin/election/:id"
-        element={<ElectionDetails />}
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <ElectionDetails />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
       />
 
-      {/* Results */}
       <Route
         path="/admin/results"
-        element={<Results />}
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <Results />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
       />
 
-      {/* Verify Students */}
       <Route
         path="/admin/verify-students"
-        element={<VerifyStudent />}
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <VerifyStudent />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
       />
+
     </Routes>
   );
 }

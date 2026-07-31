@@ -1,3 +1,11 @@
+import {
+  Vote,
+  Users,
+  UserCheck,
+  BarChart3,
+  ArrowRight,
+  Activity,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useElection } from "../../context/ElectionContext";
 
@@ -5,7 +13,6 @@ function Admin() {
   const navigate = useNavigate();
   const { elections } = useElection();
 
-  // Statistics
   const totalElections = elections.length;
 
   const totalCandidates = elections.reduce(
@@ -30,179 +37,239 @@ function Admin() {
   const menuItems = [
     {
       title: "Create Election",
-      description: "Create a new election.",
+      description: "Create and publish a new election.",
       route: "/admin/create-election",
+      icon: <Vote size={28} />,
     },
     {
       title: "Manage Elections",
-      description: "View and manage elections.",
+      description: "Edit or monitor elections.",
       route: "/admin/elections",
+      icon: <BarChart3 size={28} />,
     },
     {
       title: "Verify Students",
       description: "Approve eligible voters.",
       route: "/admin/verify-students",
+      icon: <UserCheck size={28} />,
     },
     {
-      title: "Results",
-      description: "View live election results.",
+      title: "View Results",
+      description: "Monitor live election results.",
       route: "/admin/results",
+      icon: <Activity size={28} />,
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-6">
-      <div className="max-w-6xl mx-auto space-y-10">
+    <div className="min-h-screen bg-slate-950 text-white p-8">
+
+      <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-        <div className="bg-white border border-gray-200 rounded-xl p-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+        <div className="rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-700 p-8 shadow-xl">
+
+          <h1 className="text-4xl font-bold">
             Admin Dashboard
           </h1>
 
-          <p className="text-gray-600 mt-2">
-            Manage elections, candidates, students and monitor voting activity.
+          <p className="mt-3 text-cyan-100">
+            Manage elections, candidates, students and monitor the entire blockchain voting system.
           </p>
+
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h2 className="text-sm font-medium uppercase text-gray-500">
-              Total Elections
-            </h2>
-            <p className="text-3xl font-bold text-gray-900 mt-3">
-              {totalElections}
-            </p>
-          </div>
+          <StatCard
+            icon={<Vote className="text-cyan-400" size={32} />}
+            title="Total Elections"
+            value={totalElections}
+          />
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h2 className="text-sm font-medium uppercase text-gray-500">
-              Candidates
-            </h2>
-            <p className="text-3xl font-bold text-gray-900 mt-3">
-              {totalCandidates}
-            </p>
-          </div>
+          <StatCard
+            icon={<Users className="text-green-400" size={32} />}
+            title="Candidates"
+            value={totalCandidates}
+          />
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h2 className="text-sm font-medium uppercase text-gray-500">
-              Active Elections
-            </h2>
-            <p className="text-3xl font-bold text-gray-900 mt-3">
-              {activeElections}
-            </p>
-          </div>
+          <StatCard
+            icon={<Activity className="text-purple-400" size={32} />}
+            title="Active Elections"
+            value={activeElections}
+          />
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h2 className="text-sm font-medium uppercase text-gray-500">
-              Total Votes
-            </h2>
-            <p className="text-3xl font-bold text-gray-900 mt-3">
-              {totalVotes}
-            </p>
-          </div>
+          <StatCard
+            icon={<BarChart3 className="text-yellow-400" size={32} />}
+            title="Total Votes"
+            value={totalVotes}
+          />
 
         </div>
 
         {/* Quick Actions */}
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        <div className="mt-12">
+
+          <h2 className="text-3xl font-bold mb-6">
             Quick Actions
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
 
             {menuItems.map((item) => (
+
               <div
                 key={item.title}
-                className="bg-white border border-gray-200 rounded-xl p-6"
+                className="rounded-2xl border border-slate-800 bg-slate-900 p-6 hover:border-cyan-500 transition-all duration-300"
               >
-                <h3 className="text-xl font-semibold text-gray-900">
+
+                <div className="flex justify-between items-center">
+
+                  <div className="text-cyan-400">
+                    {item.icon}
+                  </div>
+
+                  <ArrowRight className="text-slate-500" />
+
+                </div>
+
+                <h3 className="text-2xl font-bold mt-6">
                   {item.title}
                 </h3>
 
-                <p className="text-gray-600 mt-2">
+                <p className="text-slate-400 mt-3">
                   {item.description}
                 </p>
 
                 <button
                   onClick={() => navigate(item.route)}
-                  className="mt-6 px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                  className="mt-6 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-semibold hover:scale-105 transition"
                 >
                   Open
                 </button>
+
               </div>
+
             ))}
 
           </div>
+
         </div>
 
         {/* Recent Elections */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        <div className="mt-12 rounded-3xl border border-slate-800 bg-slate-900 p-8">
+
+          <h2 className="text-3xl font-bold mb-8">
             Recent Elections
           </h2>
 
           {elections.length === 0 ? (
-            <p className="text-gray-500">
+
+            <div className="text-center py-12 text-slate-400">
               No elections have been created yet.
-            </p>
+            </div>
+
           ) : (
+
             <div className="overflow-x-auto">
+
               <table className="w-full">
 
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 font-semibold">Election</th>
-                    <th className="text-left py-3 font-semibold">Status</th>
-                    <th className="text-left py-3 font-semibold">Candidates</th>
-                    <th className="text-left py-3 font-semibold">Action</th>
+
+                  <tr className="border-b border-slate-700">
+
+                    <th className="text-left py-4">Election</th>
+
+                    <th className="text-left py-4">Status</th>
+
+                    <th className="text-left py-4">Candidates</th>
+
+                    <th className="text-right py-4">Action</th>
+
                   </tr>
+
                 </thead>
 
                 <tbody>
 
                   {elections.map((election) => (
+
                     <tr
                       key={election.id}
-                      className="border-b border-gray-100 hover:bg-gray-50"
+                      className="border-b border-slate-800 hover:bg-slate-800 transition"
                     >
-                      <td className="py-4">
+
+                      <td className="py-5">
                         {election.title}
                       </td>
 
-                      <td className="py-4">
-                        {election.status}
+                      <td className="py-5">
+
+                        <span
+                          className={`rounded-full px-3 py-1 text-sm ${
+                            election.status === "Active"
+                              ? "bg-green-500/20 text-green-300"
+                              : "bg-slate-700 text-slate-300"
+                          }`}
+                        >
+                          {election.status}
+                        </span>
+
                       </td>
 
-                      <td className="py-4">
+                      <td className="py-5">
                         {election.candidates.length}
                       </td>
 
-                      <td className="py-4">
+                      <td className="py-5 text-right">
+
                         <button
                           onClick={() =>
                             navigate(`/admin/election/${election.id}`)
                           }
-                          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                          className="rounded-lg border border-cyan-500 px-4 py-2 text-cyan-400 hover:bg-cyan-500 hover:text-white transition"
                         >
                           View
                         </button>
+
                       </td>
+
                     </tr>
+
                   ))}
 
                 </tbody>
 
               </table>
+
             </div>
+
           )}
 
         </div>
 
       </div>
+
+    </div>
+  );
+}
+
+function StatCard({ icon, title, value }) {
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+
+      <div>{icon}</div>
+
+      <p className="mt-4 text-slate-400">
+        {title}
+      </p>
+
+      <h2 className="mt-2 text-4xl font-bold">
+        {value}
+      </h2>
+
     </div>
   );
 }

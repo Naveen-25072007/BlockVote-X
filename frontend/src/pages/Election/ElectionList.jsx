@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
-import { useElection } from "../../context/ElectionContext";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Search, Filter, Vote, Eye } from "lucide-react";
+import { useElection } from "../../context/ElectionContext";
 
 function ElectionList() {
   const { elections } = useElection();
@@ -14,132 +15,182 @@ function ElectionList() {
       .includes(search.toLowerCase());
 
     const matchesStatus =
-      statusFilter === "All" || election.status === statusFilter;
+      statusFilter === "All" ||
+      election.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Active":
+        return "bg-green-500/20 text-green-300";
+      case "Upcoming":
+        return "bg-yellow-500/20 text-yellow-300";
+      case "Closed":
+      case "Completed":
+        return "bg-red-500/20 text-red-300";
+      default:
+        return "bg-slate-700 text-slate-300";
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-6">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-950 text-white p-8">
+
+      <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+        <div className="rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-700 p-8 shadow-xl">
+
+          <h1 className="text-4xl font-bold">
             Manage Elections
           </h1>
 
-          <p className="text-gray-600 mt-2">
-            Search, filter and manage all elections.
+          <p className="mt-3 text-cyan-100">
+            Search, filter and manage every election in the system.
           </p>
+
         </div>
 
-        {/* Search + Filter */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <div className="grid md:grid-cols-2 gap-4">
+        {/* Search & Filter */}
+        <div className="mt-8 rounded-3xl border border-slate-800 bg-slate-900 p-6">
 
-            <input
-              type="text"
-              placeholder="Search elections..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border border-gray-300 rounded-lg px-4 py-2 outline-none focus:border-gray-500"
-            />
+          <div className="grid md:grid-cols-2 gap-5">
 
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="border border-gray-300 rounded-lg px-4 py-2 outline-none focus:border-gray-500"
-            >
-              <option>All</option>
-              <option>Upcoming</option>
-              <option>Active</option>
-              <option>Closed</option>
-            </select>
+            <div className="relative">
+
+              <Search
+                size={20}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+
+              <input
+                type="text"
+                placeholder="Search elections..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 py-3 pl-12 pr-4 outline-none focus:border-cyan-500"
+              />
+
+            </div>
+
+            <div className="relative">
+
+              <Filter
+                size={20}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+
+              <select
+                value={statusFilter}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value)
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 py-3 pl-12 pr-4 outline-none focus:border-cyan-500"
+              >
+                <option>All</option>
+                <option>Upcoming</option>
+                <option>Active</option>
+                <option>Closed</option>
+                <option>Completed</option>
+              </select>
+
+            </div>
 
           </div>
+
         </div>
 
-        {/* Election Table */}
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        {/* Elections */}
+        <div className="mt-8 rounded-3xl border border-slate-800 bg-slate-900 p-8">
+
+          <h2 className="text-2xl font-bold mb-8">
+            Elections
+          </h2>
 
           {filteredElections.length === 0 ? (
 
-            <div className="p-10 text-center">
-              <h2 className="text-xl font-semibold text-gray-800">
-                No elections found
-              </h2>
+            <div className="text-center py-20">
 
-              <p className="text-gray-500 mt-2">
-                Try changing your search or create a new election.
+              <Vote
+                size={60}
+                className="mx-auto text-slate-600"
+              />
+
+              <h3 className="mt-6 text-2xl font-bold">
+                No Elections Found
+              </h3>
+
+              <p className="mt-2 text-slate-400">
+                Try another search or create a new election.
               </p>
+
             </div>
 
           ) : (
 
-            <table className="w-full">
+            <div className="space-y-6">
 
-              <thead className="bg-gray-50 border-b border-gray-200">
+              {filteredElections.map((election) => (
 
-                <tr>
-                  <th className="text-left px-6 py-4">Election</th>
-                  <th className="text-left px-6 py-4">Status</th>
-                  <th className="text-left px-6 py-4">Candidates</th>
-                  <th className="text-left px-6 py-4">Actions</th>
-                </tr>
+                <div
+                  key={election.id}
+                  className="rounded-2xl border border-slate-800 bg-slate-800 p-6 transition hover:border-cyan-500"
+                >
 
-              </thead>
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
 
-              <tbody>
+                    <div>
 
-                {filteredElections.map((election) => (
-
-                  <tr
-                    key={election.id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="font-semibold">
+                      <h3 className="text-2xl font-bold">
                         {election.title}
-                      </div>
+                      </h3>
 
-                      <div className="text-sm text-gray-500">
+                      <p className="mt-2 text-slate-400">
                         {election.description}
+                      </p>
+
+                      <div className="mt-5 flex flex-wrap gap-3">
+
+                        <span
+                          className={`rounded-full px-4 py-1 text-sm ${getStatusColor(
+                            election.status
+                          )}`}
+                        >
+                          {election.status}
+                        </span>
+
+                        <span className="rounded-full bg-slate-700 px-4 py-1 text-sm">
+                          {election.candidates.length} Candidates
+                        </span>
+
                       </div>
-                    </td>
 
-                    <td className="px-6 py-4">
-                      {election.status}
-                    </td>
+                    </div>
 
-                    <td className="px-6 py-4">
-                      {election.candidates.length}
-                    </td>
+                    <Link
+                      to={`/admin/election/${election.id}`}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-semibold transition hover:scale-105"
+                    >
+                      <Eye size={18} />
+                      View Details
+                    </Link>
 
-                    <td className="px-6 py-4">
+                  </div>
 
-                      <Link
-                        to={`/admin/election/${election.id}`}
-                        className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-                      >
-                        View
-                      </Link>
+                </div>
 
-                    </td>
+              ))}
 
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
+            </div>
 
           )}
 
         </div>
 
       </div>
+
     </div>
   );
 }
