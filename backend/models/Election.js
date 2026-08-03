@@ -66,7 +66,7 @@ const electionSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Upcoming", "Active", "Ended"],
+     enum: ["Upcoming", "Active", "Closed", "Completed"],
       default: "Upcoming",
     },
 

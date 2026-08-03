@@ -63,10 +63,13 @@ app.get("/", (req, res) => {
 import authRoutes from "./routes/authRoutes.js";
 import electionRoutes from "./routes/electionRoutes.js";
 import voteRoutes from "./routes/voteRoutes.js";
+import candidateRoutes from "./routes/candidateRoutes.js";
 
 app.use("/api/auth", authRoutes);
 app.use("/api/elections", electionRoutes);
 app.use("/api/vote", voteRoutes);
+app.use("/api/candidates", candidateRoutes);
+
 
 // ======================
 // 404 Handler

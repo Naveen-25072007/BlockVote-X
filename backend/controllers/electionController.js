@@ -1,28 +1,16 @@
 import Election from "../models/Election.js";
 
+// ==========================================
 // Create Election
+// ==========================================
 export const createElection = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      startDate,
-      endDate,
-      candidates,
-    } = req.body;
+    const { title, description, startDate, endDate } = req.body;
 
-    // Basic Validation
-    if (
-      !title ||
-      !description ||
-      !startDate ||
-      !endDate ||
-      !candidates ||
-      candidates.length < 2
-    ) {
+    if (!title || !description || !startDate || !endDate) {
       return res.status(400).json({
         success: false,
-        message: "Please provide all fields and at least 2 candidates.",
+        message: "Please fill all required fields.",
       });
     }
 
@@ -31,8 +19,9 @@ export const createElection = async (req, res) => {
       description,
       startDate,
       endDate,
-      candidates,
-      createdBy: req.user.id,
+      status: "Upcoming",
+      candidates: [],
+      createdBy: req.user._id,
     });
 
     res.status(201).json({
@@ -50,7 +39,9 @@ export const createElection = async (req, res) => {
   }
 };
 
+// ==========================================
 // Get All Elections
+// ==========================================
 export const getAllElections = async (req, res) => {
   try {
     const elections = await Election.find().sort({ createdAt: -1 });
@@ -70,7 +61,9 @@ export const getAllElections = async (req, res) => {
   }
 };
 
-// Get Single Election
+// ==========================================
+// Get Election By ID
+// ==========================================
 export const getElectionById = async (req, res) => {
   try {
     const election = await Election.findById(req.params.id);
@@ -85,6 +78,73 @@ export const getElectionById = async (req, res) => {
     res.status(200).json({
       success: true,
       election,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+// ==========================================
+// Update Election
+// ==========================================
+export const updateElection = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+
+    if (!election) {
+      return res.status(404).json({
+        success: false,
+        message: "Election not found.",
+      });
+    }
+
+    election.title = req.body.title ?? election.title;
+    election.description = req.body.description ?? election.description;
+    election.startDate = req.body.startDate ?? election.startDate;
+    election.endDate = req.body.endDate ?? election.endDate;
+    election.status = req.body.status ?? election.status;
+
+    await election.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Election updated successfully.",
+      election,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+// ==========================================
+// Delete Election
+// ==========================================
+export const deleteElection = async (req, res) => {
+  try {
+    const election = await Election.findById(req.params.id);
+
+    if (!election) {
+      return res.status(404).json({
+        success: false,
+        message: "Election not found.",
+      });
+    }
+
+    await Election.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Election deleted successfully.",
     });
   } catch (error) {
     console.error(error);
