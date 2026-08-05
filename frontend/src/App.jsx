@@ -23,6 +23,9 @@ import StudentResults from "./pages/Student/Results";
 
 // Admin
 import Admin from "./pages/Admin/Admin";
+import Candidates from "./pages/Admin/Candidates";
+import BlockchainExplorer from "./pages/Admin/BlockchainExplorer";
+import BlockchainIntegrity from "./pages/Admin/BlockchainIntegrity/BlockchainIntegrity";
 
 // Election
 import CreateElection from "./pages/Election/CreateElection";
@@ -46,9 +49,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* ========================= */}
-      {/* Student Routes */}
-      {/* ========================= */}
+      {/* ================= STUDENT ================= */}
 
       <Route
         path="/student"
@@ -127,9 +128,7 @@ function App() {
         }
       />
 
-      {/* ========================= */}
-      {/* Admin Routes */}
-      {/* ========================= */}
+      {/* ================= ADMIN ================= */}
 
       <Route
         path="/admin"
@@ -176,6 +175,17 @@ function App() {
       />
 
       <Route
+        path="/admin/candidates/:electionId"
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <Candidates />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/admin/results"
         element={
           <ProtectedRoute>
@@ -192,6 +202,32 @@ function App() {
           <ProtectedRoute>
             <AdminRoute>
               <VerifyStudent />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Blockchain Explorer */}
+
+      <Route
+        path="/admin/blockchain"
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <BlockchainExplorer />
+            </AdminRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Blockchain Integrity */}
+
+      <Route
+        path="/admin/blockchain-integrity"
+        element={
+          <ProtectedRoute>
+            <AdminRoute>
+              <BlockchainIntegrity />
             </AdminRoute>
           </ProtectedRoute>
         }

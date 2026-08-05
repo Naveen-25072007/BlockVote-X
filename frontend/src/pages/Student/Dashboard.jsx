@@ -21,13 +21,10 @@ function Dashboard() {
         <DashboardNavbar />
 
         <div className="mt-8">
-
           <WelcomeSection />
-
         </div>
 
         {/* Status Cards */}
-
         <div className="mt-8 grid gap-6 md:grid-cols-3">
 
           <StatusCard
@@ -40,8 +37,8 @@ function Dashboard() {
 
           <StatusCard
             title="Voting Status"
-            value="Not Voted"
-            description="You haven't voted yet."
+            value="Ready"
+            description="You can participate in active elections."
             icon={<Vote size={28} />}
             color="bg-yellow-500/20 text-yellow-400"
           />
@@ -49,23 +46,19 @@ function Dashboard() {
           <StatusCard
             title="Blockchain"
             value="Connected"
-            description="Your vote will be secured."
+            description="Votes are secured using blockchain."
             icon={<Wallet size={28} />}
             color="bg-cyan-500/20 text-cyan-400"
           />
 
         </div>
 
-        {/* Election */}
-
+        {/* Active Election */}
         <div className="mt-8">
-
           <ElectionCard />
-
         </div>
 
         {/* Bottom Section */}
-
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
 
           <QuickActions />

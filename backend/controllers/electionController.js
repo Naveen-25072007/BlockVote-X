@@ -14,12 +14,25 @@ export const createElection = async (req, res) => {
       });
     }
 
+    const now = new Date();
+
+    let status = "Upcoming";
+
+    if (
+      now >= new Date(startDate) &&
+      now <= new Date(endDate)
+    ) {
+      status = "Active";
+    } else if (now > new Date(endDate)) {
+      status = "Completed";
+    }
+
     const election = await Election.create({
       title,
       description,
       startDate,
       endDate,
-      status: "Upcoming",
+      status,
       candidates: [],
       createdBy: req.user._id,
     });
@@ -29,13 +42,16 @@ export const createElection = async (req, res) => {
       message: "Election created successfully.",
       election,
     });
+
   } catch (error) {
+
     console.error(error);
 
     res.status(500).json({
       success: false,
       message: "Server Error",
     });
+
   }
 };
 
@@ -44,20 +60,55 @@ export const createElection = async (req, res) => {
 // ==========================================
 export const getAllElections = async (req, res) => {
   try {
-    const elections = await Election.find().sort({ createdAt: -1 });
+
+    const elections = await Election.find().sort({
+      createdAt: -1,
+    });
+
+    const now = new Date();
+
+    for (const election of elections) {
+
+      let status = "Upcoming";
+
+      if (
+        now >= new Date(election.startDate) &&
+        now <= new Date(election.endDate)
+      ) {
+
+        status = "Active";
+
+      } else if (now > new Date(election.endDate)) {
+
+        status = "Completed";
+
+      }
+
+      if (election.status !== status) {
+
+        election.status = status;
+
+        await election.save();
+
+      }
+
+    }
 
     res.status(200).json({
       success: true,
       count: elections.length,
       elections,
     });
+
   } catch (error) {
+
     console.error(error);
 
     res.status(500).json({
       success: false,
       message: "Server Error",
     });
+
   }
 };
 
@@ -66,26 +117,57 @@ export const getAllElections = async (req, res) => {
 // ==========================================
 export const getElectionById = async (req, res) => {
   try {
+
     const election = await Election.findById(req.params.id);
 
     if (!election) {
+
       return res.status(404).json({
         success: false,
         message: "Election not found.",
       });
+
+    }
+
+    const now = new Date();
+
+    let status = "Upcoming";
+
+    if (
+      now >= new Date(election.startDate) &&
+      now <= new Date(election.endDate)
+    ) {
+
+      status = "Active";
+
+    } else if (now > new Date(election.endDate)) {
+
+      status = "Completed";
+
+    }
+
+    if (election.status !== status) {
+
+      election.status = status;
+
+      await election.save();
+
     }
 
     res.status(200).json({
       success: true,
       election,
     });
+
   } catch (error) {
+
     console.error(error);
 
     res.status(500).json({
       success: false,
       message: "Server Error",
     });
+
   }
 };
 

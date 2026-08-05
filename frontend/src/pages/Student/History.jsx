@@ -1,53 +1,89 @@
+import { useEffect, useState } from "react";
 import {
   CheckCircle2,
   Clock3,
   ShieldCheck,
 } from "lucide-react";
-import { useElection } from "../../context/ElectionContext";
+
+import { getMyVotingHistory } from "../../api/voteApi";
 
 export default function History() {
-  const { elections } = useElection();
 
-  // Get elections where the student has voted
-  const votingHistory = elections
-    .filter((election) => election.hasVoted)
-    .map((election) => ({
-      id: election.id,
-      election: election.title,
-      candidate:
-        election.candidates.find(
-          (candidate) => candidate.id === election.selectedCandidate
-        )?.name || "Unknown Candidate",
-      date: new Date(
-        election.endDate || election.startDate
-      ).toLocaleDateString(),
-      status: "Verified",
-    }));
+  const [loading, setLoading] = useState(true);
+
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+
+    loadHistory();
+
+  }, []);
+
+  const loadHistory = async () => {
+
+    try {
+
+      const res = await getMyVotingHistory();
+
+      setHistory(res.data.history || []);
+
+    } catch (err) {
+
+      console.log(err);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+  if (loading) {
+
+    return (
+
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white text-3xl">
+
+        Loading Voting History...
+
+      </div>
+
+    );
+
+  }
 
   const latestVote =
-    votingHistory.length > 0
-      ? votingHistory[0].date
-      : "No Votes Yet";
+    history.length > 0
+      ? new Date(history[0].votedAt).toLocaleString()
+      : "No Votes";
 
   return (
+
     <div className="min-h-screen bg-slate-950 text-white p-8">
 
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
+
         <div className="rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-700 p-8 shadow-xl">
 
           <h1 className="text-4xl font-bold">
+
             Voting History
+
           </h1>
 
           <p className="mt-3 text-cyan-100">
-            View your blockchain verified voting records.
+
+            Blockchain Verified Voting Records
+
           </p>
 
         </div>
 
         {/* Summary */}
+
         <div className="grid md:grid-cols-3 gap-6 mt-8">
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
@@ -58,11 +94,15 @@ export default function History() {
             />
 
             <p className="text-slate-400">
+
               Total Votes
+
             </p>
 
             <h2 className="text-3xl font-bold mt-2">
-              {votingHistory.length}
+
+              {history.length}
+
             </h2>
 
           </div>
@@ -75,11 +115,15 @@ export default function History() {
             />
 
             <p className="text-slate-400">
-              Blockchain Status
+
+              Blockchain
+
             </p>
 
             <h2 className="text-2xl font-bold mt-2 text-green-400">
+
               Verified
+
             </h2>
 
           </div>
@@ -92,25 +136,31 @@ export default function History() {
             />
 
             <p className="text-slate-400">
+
               Latest Vote
+
             </p>
 
-            <h2 className="text-xl font-bold mt-2">
+            <h2 className="text-lg font-bold mt-2">
+
               {latestVote}
+
             </h2>
 
           </div>
 
         </div>
 
-        {/* History */}
+        {/* Records */}
+
         <div className="mt-10 rounded-3xl border border-slate-800 bg-slate-900 p-8">
 
           <h2 className="text-3xl font-bold mb-8">
-            Voting Records
-          </h2>
 
-          {votingHistory.length === 0 ? (
+            Voting Records
+
+          </h2>
+                    {history.length === 0 ? (
 
             <div className="text-center py-16">
 
@@ -120,11 +170,15 @@ export default function History() {
               />
 
               <h3 className="mt-6 text-2xl font-bold">
+
                 No Voting History
+
               </h3>
 
               <p className="mt-2 text-slate-400">
+
                 You haven't voted in any elections yet.
+
               </p>
 
             </div>
@@ -133,54 +187,113 @@ export default function History() {
 
             <div className="space-y-6">
 
-              {votingHistory.map((vote) => (
+              {history.map((vote) => (
 
                 <div
-                  key={vote.id}
+                  key={vote._id}
                   className="rounded-2xl border border-slate-800 bg-slate-800 p-6 hover:border-cyan-500 transition"
                 >
 
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                  <div className="flex flex-col lg:flex-row lg:justify-between gap-8">
 
-                    <div>
+                    <div className="flex-1">
 
-                      <h3 className="text-2xl font-semibold">
+                      <h3 className="text-2xl font-bold">
+
                         {vote.election}
+
                       </h3>
 
-                      <p className="mt-2 text-slate-400">
-                        Candidate:
-                        <span className="ml-2 text-white">
-                          {vote.candidate}
-                        </span>
+                      <p className="mt-4 text-slate-400">
+
+                        Candidate
+
                       </p>
 
-                      <p className="mt-1 text-slate-400">
-                        Date:
-                        <span className="ml-2 text-white">
-                          {vote.date}
-                        </span>
+                      <h4 className="text-lg font-semibold">
+
+                        {vote.candidate?.name || "Unknown Candidate"}
+
+                      </h4>
+
+                      <p className="text-cyan-400">
+
+                        {vote.candidate?.party || "-"}
+
                       </p>
+
+                      <p className="mt-5 text-slate-400">
+
+                        Vote Time
+
+                      </p>
+
+                      <h4>
+
+                        {new Date(vote.votedAt).toLocaleString()}
+
+                      </h4>
 
                     </div>
 
-                    <div className="text-right">
+                    <div className="flex-1">
 
-                      <span className="inline-flex items-center gap-2 rounded-full bg-green-500/20 px-4 py-2 text-green-300">
+                      <div className="rounded-xl bg-slate-900 p-4">
 
-                        <ShieldCheck size={18} />
+                        <p className="text-slate-400">
 
-                        {vote.status}
+                          Block Number
 
-                      </span>
+                        </p>
 
-                      <p className="mt-4 text-sm text-slate-500">
-                        Election ID
-                      </p>
+                        <h2 className="text-3xl font-bold text-cyan-400">
 
-                      <p className="font-mono text-cyan-400">
-                        {vote.id}
-                      </p>
+                          #{vote.blockNumber}
+
+                        </h2>
+
+                      </div>
+
+                      <div className="mt-5">
+
+                        <p className="text-slate-400">
+
+                          Blockchain Hash
+
+                        </p>
+
+                        <div className="mt-2 rounded-xl bg-slate-900 p-4 font-mono text-xs break-all text-green-400">
+
+                          {vote.blockchainHash}
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <div className="lg:w-56">
+
+                      <div className="rounded-xl border border-green-500 bg-green-500/10 p-5 text-center">
+
+                        <ShieldCheck
+                          size={40}
+                          className="mx-auto text-green-400"
+                        />
+
+                        <h3 className="mt-4 text-xl font-bold text-green-400">
+
+                          Verified
+
+                        </h3>
+
+                        <p className="mt-2 text-sm text-slate-400">
+
+                          This vote is permanently stored in the blockchain.
+
+                        </p>
+
+                      </div>
 
                     </div>
 
@@ -199,5 +312,7 @@ export default function History() {
       </div>
 
     </div>
+
   );
+
 }

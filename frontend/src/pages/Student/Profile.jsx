@@ -1,198 +1,298 @@
+import { useEffect, useState } from "react";
 import {
   User,
   Mail,
   GraduationCap,
   ShieldCheck,
-  BadgeCheck,
-  Calendar,
+  Vote,
+  Link2,
 } from "lucide-react";
 
-function Profile() {
-  // Dummy data (replace with backend data later)
-  const student = {
-    name: "Naveen Chandra",
-    studentId: "22B81A0501",
-    email: "naveen@example.com",
-    department: "Computer Science & Engineering",
-    year: "3rd Year",
-    verified: true,
-    joined: "August 2024",
+import { getProfile } from "../../api/userApi";
+
+export default function Profile() {
+
+  const [loading, setLoading] = useState(true);
+
+  const [user, setUser] = useState(null);
+
+  const [stats, setStats] = useState({
+    totalVotes: 0,
+  });
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+
+      const res = await getProfile();
+
+      setUser(res.data.user);
+
+      setStats(res.data.statistics);
+
+    } catch (err) {
+
+      console.log(err);
+
+    } finally {
+
+      setLoading(false);
+
+    }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white text-3xl">
+        Loading Profile...
+      </div>
+    );
+  }
+
   return (
+
     <div className="min-h-screen bg-slate-950 text-white p-8">
+
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
+
         <div className="rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-700 p-8 shadow-xl">
 
-          <div className="flex flex-col md:flex-row items-center gap-8">
+          <h1 className="text-4xl font-bold">
 
-            <div className="w-32 h-32 rounded-full bg-white/20 flex items-center justify-center">
-              <User size={60} />
-            </div>
+            Student Profile
 
-            <div>
+          </h1>
 
-              <h1 className="text-4xl font-bold">
-                {student.name}
-              </h1>
+          <p className="mt-3 text-cyan-100">
 
-              <p className="text-cyan-100 mt-2">
-                Student Profile
-              </p>
+            Your blockchain identity
 
-              <div className="mt-4 inline-flex items-center gap-2 bg-green-500/20 px-4 py-2 rounded-full text-green-300">
-                <ShieldCheck size={18} />
-                Blockchain Verified
-              </div>
-
-            </div>
-
-          </div>
+          </p>
 
         </div>
 
-        {/* Profile Details */}
-        <div className="grid lg:grid-cols-2 gap-8 mt-10">
+        <div className="grid lg:grid-cols-3 gap-8 mt-8">
+                    {/* ================= Profile Card ================= */}
 
-          {/* Personal Information */}
-          <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
+          <div className="lg:col-span-1">
 
-            <h2 className="text-2xl font-bold mb-6">
-              Personal Information
-            </h2>
+            <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
 
-            <div className="space-y-6">
+              <div className="flex justify-center">
 
-              <div className="flex items-center gap-4">
-                <User className="text-cyan-400" />
-                <div>
-                  <p className="text-slate-400 text-sm">
-                    Full Name
-                  </p>
-                  <p className="text-lg font-semibold">
-                    {student.name}
-                  </p>
+                <div className="h-32 w-32 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center">
+
+                  <User size={60} />
+
                 </div>
+
               </div>
 
-              <div className="flex items-center gap-4">
-                <BadgeCheck className="text-cyan-400" />
-                <div>
-                  <p className="text-slate-400 text-sm">
-                    Student ID
-                  </p>
-                  <p className="text-lg font-semibold">
-                    {student.studentId}
-                  </p>
-                </div>
-              </div>
+              <h2 className="mt-6 text-center text-3xl font-bold">
 
-              <div className="flex items-center gap-4">
-                <Mail className="text-cyan-400" />
-                <div>
-                  <p className="text-slate-400 text-sm">
-                    Email
-                  </p>
-                  <p className="text-lg font-semibold">
-                    {student.email}
-                  </p>
+                {user.fullName}
+
+              </h2>
+
+              <p className="text-center text-slate-400 mt-2">
+
+                {user.role.toUpperCase()}
+
+              </p>
+
+              <div className="mt-8 space-y-5">
+
+                <div className="flex items-center gap-3">
+
+                  <Mail className="text-cyan-400" />
+
+                  <span>{user.email}</span>
+
                 </div>
+
+                <div className="flex items-center gap-3">
+
+                  <GraduationCap className="text-green-400" />
+
+                  <span>
+                    {user.studentId || "Student ID Not Available"}
+                  </span>
+
+                </div>
+
+                <div className="flex items-center gap-3">
+
+                  <ShieldCheck className="text-purple-400" />
+
+                  <span>
+                    {user.hasVoted
+                      ? "Already Participated"
+                      : "Eligible to Vote"}
+                  </span>
+
+                </div>
+
               </div>
 
             </div>
 
           </div>
 
-          {/* Academic Information */}
-          <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
+          {/* ================= Statistics ================= */}
 
-            <h2 className="text-2xl font-bold mb-6">
-              Academic Information
-            </h2>
+          <div className="lg:col-span-2">
 
-            <div className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
 
-              <div className="flex items-center gap-4">
-                <GraduationCap className="text-cyan-400" />
-                <div>
-                  <p className="text-slate-400 text-sm">
-                    Department
-                  </p>
-                  <p className="text-lg font-semibold">
-                    {student.department}
-                  </p>
-                </div>
+              <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
+
+                <Vote
+                  size={40}
+                  className="text-cyan-400"
+                />
+
+                <p className="mt-4 text-slate-400">
+
+                  Total Votes
+
+                </p>
+
+                <h2 className="mt-2 text-5xl font-bold">
+
+                  {stats.totalVotes}
+
+                </h2>
+
               </div>
 
-              <div className="flex items-center gap-4">
-                <Calendar className="text-cyan-400" />
-                <div>
-                  <p className="text-slate-400 text-sm">
-                    Year
-                  </p>
-                  <p className="text-lg font-semibold">
-                    {student.year}
-                  </p>
-                </div>
-              </div>
+              <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
 
-              <div className="flex items-center gap-4">
-                <ShieldCheck className="text-green-400" />
-                <div>
-                  <p className="text-slate-400 text-sm">
-                    Verification Status
-                  </p>
-                  <p className="text-lg font-semibold text-green-400">
-                    {student.verified ? "Verified" : "Pending"}
-                  </p>
-                </div>
+                <Link2
+                  size={40}
+                  className="text-green-400"
+                />
+
+                <p className="mt-4 text-slate-400">
+
+                  Blockchain Status
+
+                </p>
+
+                <h2 className="mt-2 text-3xl font-bold text-green-400">
+
+                  Connected
+
+                </h2>
+
               </div>
 
             </div>
 
-          </div>
+            <div className="mt-8 rounded-3xl border border-slate-800 bg-slate-900 p-8">
 
-        </div>
+              <h2 className="text-3xl font-bold">
 
-        {/* Account Info */}
-        <div className="mt-10 rounded-3xl border border-slate-800 bg-slate-900 p-8">
-
-          <h2 className="text-2xl font-bold mb-6">
-            Account Summary
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-6">
-
-            <div className="rounded-2xl bg-slate-800 p-6">
-              <p className="text-slate-400">
-                Member Since
-              </p>
-
-              <h3 className="text-2xl font-bold mt-2">
-                {student.joined}
-              </h3>
-            </div>
-
-            <div className="rounded-2xl bg-slate-800 p-6">
-              <p className="text-slate-400">
-                Voting Status
-              </p>
-
-              <h3 className="text-2xl font-bold mt-2 text-green-400">
-                Eligible
-              </h3>
-            </div>
-
-            <div className="rounded-2xl bg-slate-800 p-6">
-              <p className="text-slate-400">
                 Blockchain Identity
-              </p>
 
-              <h3 className="text-lg font-bold mt-2 text-cyan-400">
-                Active
-              </h3>
+              </h2>
+
+              <div className="mt-8 space-y-5">
+
+                <div className="flex justify-between border-b border-slate-800 pb-4">
+
+                  <span className="text-slate-400">
+
+                    Name
+
+                  </span>
+
+                  <span>
+
+                    {user.fullName}
+
+                  </span>
+
+                </div>
+
+                <div className="flex justify-between border-b border-slate-800 pb-4">
+
+                  <span className="text-slate-400">
+
+                    Email
+
+                  </span>
+
+                  <span>
+
+                    {user.email}
+
+                  </span>
+
+                </div>
+
+                <div className="flex justify-between border-b border-slate-800 pb-4">
+
+                  <span className="text-slate-400">
+
+                    Role
+
+                  </span>
+
+                  <span>
+
+                    {user.role}
+
+                  </span>
+
+                </div>
+
+                <div className="flex justify-between border-b border-slate-800 pb-4">
+
+                  <span className="text-slate-400">
+
+                    Student ID
+
+                  </span>
+
+                  <span>
+
+                    {user.studentId || "N/A"}
+
+                  </span>
+
+                </div>
+
+                <div className="flex justify-between">
+
+                  <span className="text-slate-400">
+
+                    Voting Status
+
+                  </span>
+
+                  <span
+                    className={
+                      user.hasVoted
+                        ? "text-green-400"
+                        : "text-yellow-400"
+                    }
+                  >
+
+                    {user.hasVoted
+                      ? "Vote Recorded"
+                      : "Pending"}
+
+                  </span>
+
+                </div>
+
+              </div>
+
             </div>
 
           </div>
@@ -200,8 +300,10 @@ function Profile() {
         </div>
 
       </div>
-    </div>
-  );
-}
 
-export default Profile;
+    </div>
+
+  );
+
+}
+      

@@ -1,149 +1,197 @@
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+
+import {
+  getAllElections,
+  createElection,
+  updateElection as updateElectionApi,
+  deleteElection as deleteElectionApi,
+} from "../api/electionApi";
 
 const ElectionContext = createContext();
 
 export function ElectionProvider({ children }) {
   const [elections, setElections] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Auto Status
-  const getElectionStatus = (startDate, endDate) => {
-    const now = new Date();
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+  // ===========================
+  // Normalize Election
+  // ===========================
+  const normalizeElection = (election) => ({
+    ...election,
+    id: election._id,
 
-    if (now < start) return "Upcoming";
-    if (now >= start && now <= end) return "Active";
-    return "Closed";
-  };
+    candidates: (election.candidates || []).map((candidate) => ({
+      ...candidate,
+      id: candidate._id,
+      votes: candidate.votes || 0,
+    })),
+  });
 
+  // ===========================
+  // Load Elections
+  // ===========================
+  const fetchElections = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await getAllElections();
+
+      console.log("========== Election Context ==========");
+      console.log(response);
+      console.log(response.data);
+      console.log(response.data.elections);
+      console.log("======================================");
+
+      const electionList = response.data.elections || [];
+
+      const normalized = electionList.map(normalizeElection);
+
+      setElections(normalized);
+
+    } catch (err) {
+
+      console.error("Election Context Error:", err);
+
+      setError(
+        err.response?.data?.message ||
+        "Failed to load elections."
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  }, []);
+
+  // ===========================
+  // Load On Startup
+  // ===========================
+  useEffect(() => {
+    fetchElections();
+  }, [fetchElections]);
+
+  // ===========================
   // Create Election
-  const addElection = (election) => {
-    const newElection = {
-      id: Date.now(),
-      title: election.title,
-      description: election.description,
-      startDate: election.startDate,
-      endDate: election.endDate,
-      status: getElectionStatus(
-        election.startDate,
-        election.endDate
-      ),
-      candidates: [],
-      hasVoted: false,
-    };
+  // ===========================
+  const addElection = async (data) => {
+    try {
 
-    setElections((prev) => [...prev, newElection]);
+      setError("");
+
+      const response = await createElection(data);
+
+      await fetchElections();
+
+      return response.data;
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        err.response?.data?.message ||
+        "Failed to create election."
+      );
+
+      throw err;
+    }
   };
 
+  // ===========================
   // Update Election
-  const updateElection = (id, updatedData) => {
-    setElections((prev) =>
-      prev.map((election) =>
-        election.id === id
-          ? {
-              ...election,
-              ...updatedData,
-              status: getElectionStatus(
-                updatedData.startDate || election.startDate,
-                updatedData.endDate || election.endDate
-              ),
-            }
-          : election
-      )
-    );
+  // ===========================
+  const updateElection = async (id, data) => {
+    try {
+
+      setError("");
+
+      const response = await updateElectionApi(id, data);
+
+      await fetchElections();
+
+      return response.data;
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        err.response?.data?.message ||
+        "Failed to update election."
+      );
+
+      throw err;
+    }
   };
 
-  // Change Status
-  const updateElectionStatus = (id, status) => {
-    setElections((prev) =>
-      prev.map((election) =>
-        election.id === id
-          ? { ...election, status }
-          : election
-      )
-    );
+  // ===========================
+  // Update Status
+  // ===========================
+  const updateElectionStatus = async (id, status) => {
+    return updateElection(id, {
+      status,
+    });
   };
 
+  // ===========================
   // Delete Election
-  const deleteElection = (id) => {
-    setElections((prev) =>
-      prev.filter((election) => election.id !== id)
-    );
+  // ===========================
+  const deleteElection = async (id) => {
+    try {
+
+      setError("");
+
+      const response = await deleteElectionApi(id);
+
+      setElections((prev) =>
+        prev.filter((election) => election.id !== id)
+      );
+
+      return response.data;
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        err.response?.data?.message ||
+        "Failed to delete election."
+      );
+
+      throw err;
+    }
   };
 
-  // Add Candidate
-  const addCandidate = (electionId, candidate) => {
-    setElections((prev) =>
-      prev.map((election) =>
-        election.id === electionId
-          ? {
-              ...election,
-              candidates: [
-                ...election.candidates,
-                {
-                  id: Date.now(),
-                  name: candidate.name,
-                  party: candidate.party,
-                  votes: 0,
-                },
-              ],
-            }
-          : election
-      )
-    );
-  };
-
-  // Delete Candidate
-  const deleteCandidate = (electionId, candidateId) => {
-    setElections((prev) =>
-      prev.map((election) =>
-        election.id === electionId
-          ? {
-              ...election,
-              candidates: election.candidates.filter(
-                (candidate) => candidate.id !== candidateId
-              ),
-            }
-          : election
-      )
-    );
-  };
-
-  // Submit Vote
-  const submitVote = (electionId, candidateId) => {
-    setElections((prev) =>
-      prev.map((election) => {
-        if (election.id !== electionId) return election;
-
-        if (election.hasVoted) return election;
-
-        return {
-          ...election,
-          hasVoted: true,
-          candidates: election.candidates.map((candidate) =>
-            candidate.id === candidateId
-              ? {
-                  ...candidate,
-                  votes: candidate.votes + 1,
-                }
-              : candidate
-          ),
-        };
-      })
-    );
+  // ===========================
+  // Refresh
+  // ===========================
+  const refreshElections = async () => {
+    await fetchElections();
   };
 
   return (
     <ElectionContext.Provider
       value={{
         elections,
+        loading,
+        error,
+
         addElection,
         updateElection,
         updateElectionStatus,
         deleteElection,
-        addCandidate,
-        deleteCandidate,
-        submitVote,
+
+        refreshElections,
+        fetchElections,
       }}
     >
       {children}
@@ -152,5 +200,13 @@ export function ElectionProvider({ children }) {
 }
 
 export function useElection() {
-  return useContext(ElectionContext);
+  const context = useContext(ElectionContext);
+
+  if (!context) {
+    throw new Error(
+      "useElection must be used inside ElectionProvider"
+    );
+  }
+
+  return context;
 }
