@@ -1,24 +1,48 @@
 import {
   LayoutDashboard,
-  Vote,
   History,
   BarChart3,
   User,
   LogOut,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+
+import { NavLink, useNavigate } from "react-router-dom";
 
 const menu = [
-  { name: "Dashboard", icon: LayoutDashboard, path: "/student/dashboard" },
-  { name: "Vote", icon: Vote, path: "/student/vote" },
-  { name: "History", icon: History, path: "/student/history" },
-  { name: "Results", icon: BarChart3, path: "/student/results" },
-  { name: "Profile", icon: User, path: "/student/profile" },
+  {
+    name: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/student/dashboard",
+  },
+  {
+    name: "History",
+    icon: History,
+    path: "/student/history",
+  },
+  {
+    name: "Results",
+    icon: BarChart3,
+    path: "/student/results",
+  },
+  {
+    name: "Profile",
+    icon: User,
+    path: "/student/profile",
+  },
 ];
 
 function Sidebar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login");
+  };
+
   return (
-    <aside className="w-72 min-h-screen bg-slate-900 border-r border-slate-800 p-6">
+    <aside className="relative w-72 min-h-screen bg-slate-900 border-r border-slate-800 p-6">
 
       <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
         BlockVote X
@@ -53,7 +77,10 @@ function Sidebar() {
 
       </nav>
 
-      <button className="absolute bottom-8 left-6 flex items-center gap-3 text-red-400 hover:text-red-300">
+      <button
+        onClick={handleLogout}
+        className="absolute bottom-8 left-6 flex items-center gap-3 text-red-400 hover:text-red-300 transition"
+      >
         <LogOut size={20} />
         Logout
       </button>
