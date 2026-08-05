@@ -2,34 +2,21 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import path from "path";
-import { fileURLToPath } from "url";
 
+// Routes
+import authRoutes from "./routes/authRoutes.js";
+import electionRoutes from "./routes/electionRoutes.js";
+import voteRoutes from "./routes/voteRoutes.js";
+import candidateRoutes from "./routes/candidateRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+
+// Database
 import connectDB from "./config/db.js";
-
-// ======================
-// ES Module __dirname
-// ======================
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // ======================
 // Load Environment Variables
 // ======================
-const result = dotenv.config({
-  path: path.join(__dirname, ".env"),
-});
-
-console.log("Dotenv Result:", result.error ? result.error : "Loaded Successfully");
-console.log("Current Directory:", __dirname);
-console.log("Loaded ADMIN_SECRET:", process.env.ADMIN_SECRET);
-console.log("Loaded JWT_SECRET:", process.env.JWT_SECRET);
-console.log("Loaded MONGODB_URI:", process.env.MONGODB_URI);
-
-// ======================
-// Create Express App
-// ======================
-const app = express();
+dotenv.config();
 
 // ======================
 // Connect Database
@@ -37,11 +24,19 @@ const app = express();
 connectDB();
 
 // ======================
+// Create Express App
+// ======================
+const app = express();
+
+// ======================
 // Middleware
 // ======================
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://your-vercel-app.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -58,20 +53,13 @@ app.get("/", (req, res) => {
 });
 
 // ======================
-// Routes
+// API Routes
 // ======================
-import authRoutes from "./routes/authRoutes.js";
-import electionRoutes from "./routes/electionRoutes.js";
-import voteRoutes from "./routes/voteRoutes.js";
-import candidateRoutes from "./routes/candidateRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-
-app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/elections", electionRoutes);
 app.use("/api/vote", voteRoutes);
 app.use("/api/candidates", candidateRoutes);
-
 
 // ======================
 // 404 Handler
@@ -87,7 +75,7 @@ app.use((req, res) => {
 // Global Error Handler
 // ======================
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error(err);
 
   res.status(500).json({
     success: false,
@@ -101,5 +89,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
