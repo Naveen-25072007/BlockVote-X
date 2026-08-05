@@ -4,10 +4,10 @@ import api from "./api";
 export const castVote = (data) =>
   api.post("/vote", data);
 
-// Alias for compatibility
+// Compatibility
 export const submitVote = castVote;
 
-// Student Voting History
+// Voting History
 export const getMyVotingHistory = () =>
   api.get("/vote/history");
 
