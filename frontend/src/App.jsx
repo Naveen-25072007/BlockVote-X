@@ -25,7 +25,6 @@ import StudentResults from "./pages/Student/Results";
 import Admin from "./pages/Admin/Admin";
 import Candidates from "./pages/Admin/Candidates";
 import BlockchainExplorer from "./pages/Admin/BlockchainExplorer";
-import BlockchainIntegrity from "./pages/Admin/BlockchainIntegrity/BlockchainIntegrity";
 
 // Election
 import CreateElection from "./pages/Election/CreateElection";
@@ -41,7 +40,6 @@ import VerifyStudent from "./pages/Student/VerifyStudent/VerifyStudent";
 function App() {
   return (
     <Routes>
-
       {/* Home */}
       <Route path="/" element={<Home />} />
 
@@ -207,8 +205,6 @@ function App() {
         }
       />
 
-      {/* Blockchain Explorer */}
-
       <Route
         path="/admin/blockchain"
         element={
@@ -219,20 +215,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
-      {/* Blockchain Integrity */}
-
-      <Route
-        path="/admin/blockchain-integrity"
-        element={
-          <ProtectedRoute>
-            <AdminRoute>
-              <BlockchainIntegrity />
-            </AdminRoute>
-          </ProtectedRoute>
-        }
-      />
-
     </Routes>
   );
 }
