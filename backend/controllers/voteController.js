@@ -8,10 +8,11 @@ import { generateBlock } from "../utils/blockchain.js";
 // ===============================================
 export const castVote = async (req, res) => {
   try {
-
     const { electionId, candidateId } = req.body;
 
+    // -------------------------------------------
     // Validate Request
+    // -------------------------------------------
     if (!electionId || !candidateId) {
       return res.status(400).json({
         success: false,
@@ -19,7 +20,9 @@ export const castVote = async (req, res) => {
       });
     }
 
+    // -------------------------------------------
     // Find Election
+    // -------------------------------------------
     const election = await Election.findById(electionId);
 
     if (!election) {
@@ -29,7 +32,9 @@ export const castVote = async (req, res) => {
       });
     }
 
-    // Election Must Be Active
+    // -------------------------------------------
+    // Check Election Status
+    // -------------------------------------------
     if (election.status !== "Active") {
       return res.status(400).json({
         success: false,
@@ -37,28 +42,41 @@ export const castVote = async (req, res) => {
       });
     }
 
-    // Find Student
+    // -------------------------------------------
+    // Find Current Logged-in Student
+    // -------------------------------------------
     const student = await User.findById(req.user._id);
 
     if (!student) {
       return res.status(404).json({
         success: false,
-        message: "Student not found.",
+        message: "Student account not found.",
       });
     }
 
-    // Student must be verified
-    if (!student.isVerified) {
+    console.log("Voting User:", {
+      id: student._id.toString(),
+      email: student.email,
+      isVerified: student.isVerified,
+    });
+
+    // -------------------------------------------
+    // Check Student Verification
+    // -------------------------------------------
+    if (student.isVerified !== true) {
       return res.status(403).json({
         success: false,
-        message: "Your account is not verified by the administrator.",
+        message:
+          "Your account is not verified by the administrator.",
       });
     }
 
+    // -------------------------------------------
     // Prevent Double Voting
+    // -------------------------------------------
     const existingVote = await Vote.findOne({
-      student: req.user._id,
-      election: electionId,
+      student: student._id,
+      election: election._id,
     });
 
     if (existingVote) {
@@ -68,7 +86,9 @@ export const castVote = async (req, res) => {
       });
     }
 
+    // -------------------------------------------
     // Find Candidate
+    // -------------------------------------------
     const candidate = election.candidates.id(candidateId);
 
     if (!candidate) {
@@ -78,30 +98,22 @@ export const castVote = async (req, res) => {
       });
     }
 
-    // Increase Vote Count
-    candidate.votes += 1;
-
-    await election.save();
-
-    // Update Student
-    student.hasVoted = true;
-    student.votedElection = electionId;
-    student.selectedCandidate = candidateId;
-
-    await student.save();
-
-    // Generate Blockchain Block
+    // -------------------------------------------
+    // Generate Blockchain Block FIRST
+    // -------------------------------------------
     const block = await generateBlock(
-      req.user._id.toString(),
-      electionId,
-      candidateId
+      student._id.toString(),
+      election._id.toString(),
+      candidate._id.toString()
     );
 
+    // -------------------------------------------
     // Save Vote
+    // -------------------------------------------
     const vote = await Vote.create({
-      student: req.user._id,
-      election: electionId,
-      candidate: candidateId,
+      student: student._id,
+      election: election._id,
+      candidate: candidate._id,
 
       blockchainHash: block.blockchainHash,
       previousHash: block.previousHash,
@@ -109,7 +121,26 @@ export const castVote = async (req, res) => {
       votedAt: block.votedAt,
     });
 
-    res.status(201).json({
+    // -------------------------------------------
+    // Increase Candidate Vote Count
+    // -------------------------------------------
+    candidate.votes += 1;
+
+    await election.save();
+
+    // -------------------------------------------
+    // Update Student Voting Status
+    // -------------------------------------------
+    student.hasVoted = true;
+    student.votedElection = election._id;
+    student.selectedCandidate = candidate._id;
+
+    await student.save();
+
+    // -------------------------------------------
+    // Success Response
+    // -------------------------------------------
+    return res.status(201).json({
       success: true,
       message: "Vote Cast Successfully!",
       vote,
@@ -121,22 +152,21 @@ export const castVote = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("CAST VOTE ERROR:", error);
 
-    console.error(error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: error.message || "Internal Server Error",
     });
-
   }
 };
+
+
 // ===============================================
 // Blockchain Explorer
 // ===============================================
 export const getBlockchain = async (req, res) => {
   try {
-
     const votes = await Vote.find()
       .populate("student", "fullName email")
       .populate("election", "title")
@@ -145,24 +175,26 @@ export const getBlockchain = async (req, res) => {
     const blockchain = [];
 
     for (const vote of votes) {
+      const election = await Election.findById(
+        vote.election._id
+      );
 
-      const election = await Election.findById(vote.election._id);
-
-      const candidate = election?.candidates.id(vote.candidate);
+      const candidate = election?.candidates.id(
+        vote.candidate
+      );
 
       blockchain.push({
-
         _id: vote._id,
 
         blockNumber: vote.blockNumber,
 
         student: {
-          name: vote.student.fullName,
-          email: vote.student.email,
+          name: vote.student?.fullName || "Unknown",
+          email: vote.student?.email || "Unknown",
         },
 
         election: {
-          title: vote.election.title,
+          title: vote.election?.title || "Unknown",
         },
 
         candidate: candidate
@@ -180,94 +212,78 @@ export const getBlockchain = async (req, res) => {
         previousHash: vote.previousHash,
 
         votedAt: vote.votedAt,
-
       });
-
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: blockchain.length,
       blockchain,
     });
 
   } catch (error) {
+    console.error("BLOCKCHAIN FETCH ERROR:", error);
 
-    console.error(error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch blockchain.",
     });
-
   }
 };
+
 
 // ===============================================
 // Verify Blockchain Integrity
 // ===============================================
 export const verifyBlockchain = async (req, res) => {
   try {
-
     const votes = await Vote.find().sort({
       blockNumber: 1,
     });
 
     if (votes.length === 0) {
-
       return res.status(200).json({
         success: true,
         verified: true,
         totalBlocks: 0,
         invalidBlocks: [],
       });
-
     }
 
     const invalidBlocks = [];
 
     for (let i = 1; i < votes.length; i++) {
-
       if (
         votes[i].previousHash !==
         votes[i - 1].blockchainHash
       ) {
-
         invalidBlocks.push(votes[i].blockNumber);
-
       }
-
     }
 
-    res.status(200).json({
-
+    return res.status(200).json({
       success: true,
-
       verified: invalidBlocks.length === 0,
-
       totalBlocks: votes.length,
-
       invalidBlocks,
-
     });
 
   } catch (error) {
+    console.error("BLOCKCHAIN VERIFICATION ERROR:", error);
 
-    console.error(error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to verify blockchain.",
     });
-
   }
 };
+
+
 // ===============================================
 // Student Voting History
 // ===============================================
 export const getMyVotingHistory = async (req, res) => {
   try {
-
     const votes = await Vote.find({
       student: req.user._id,
     })
@@ -278,10 +294,13 @@ export const getMyVotingHistory = async (req, res) => {
     const history = [];
 
     for (const vote of votes) {
+      const election = await Election.findById(
+        vote.election._id
+      );
 
-      const election = await Election.findById(vote.election._id);
-
-      const candidate = election?.candidates.id(vote.candidate);
+      const candidate = election?.candidates.id(
+        vote.candidate
+      );
 
       history.push({
         _id: vote._id,
@@ -306,23 +325,20 @@ export const getMyVotingHistory = async (req, res) => {
 
         previousHash: vote.previousHash,
       });
-
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: history.length,
       history,
     });
 
   } catch (error) {
+    console.error("VOTING HISTORY ERROR:", error);
 
-    console.error(error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to load voting history.",
     });
-
   }
 };
