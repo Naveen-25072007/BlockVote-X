@@ -1,101 +1,97 @@
 import { useEffect, useState } from "react";
-import { ShieldCheck, User, Mail, CheckCircle } from "lucide-react";
+import {
+  ShieldCheck,
+  User,
+  Mail,
+  CheckCircle,
+} from "lucide-react";
 
 import {
   getStudents,
   verifyStudent,
 } from "../../../api/userApi";
 
-export default function VerifyStudent() {
-
+function VerifyStudent() {
   const [students, setStudents] = useState([]);
-
   const [loading, setLoading] = useState(true);
 
+  // ==========================================
+  // Load Students
+  // ==========================================
   useEffect(() => {
-
     loadStudents();
-
   }, []);
 
   const loadStudents = async () => {
-
     try {
+      setLoading(true);
 
       const res = await getStudents();
 
-      setStudents(res.data.students);
-
+      setStudents(res.data.students || []);
     } catch (err) {
-
-      console.log(err);
-
+      console.log("Error loading students:", err);
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
+  // ==========================================
+  // Verify Student
+  // ==========================================
   const handleVerify = async (id) => {
-
     try {
-
       await verifyStudent(id);
 
-      loadStudents();
+      await loadStudents();
 
       alert("Student Verified Successfully");
-
     } catch (err) {
+      console.log("Verification error:", err);
 
-      console.log(err);
-
-      alert("Verification Failed");
-
+      alert(
+        err.response?.data?.message ||
+          "Verification Failed"
+      );
     }
-
   };
 
+  // ==========================================
+  // Loading
+  // ==========================================
   if (loading) {
-
     return (
-
       <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white text-3xl">
-
         Loading Students...
-
       </div>
-
     );
-
   }
 
+  // ==========================================
+  // UI
+  // ==========================================
   return (
-
     <div className="min-h-screen bg-slate-950 text-white p-8">
 
       <div className="max-w-7xl mx-auto">
 
+        {/* Header */}
         <div className="rounded-3xl bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-700 p-8 shadow-xl">
 
           <h1 className="text-4xl font-bold">
-
             Verify Students
-
           </h1>
 
           <p className="mt-3 text-cyan-100">
-
             Approve students before allowing them to vote.
-
           </p>
 
         </div>
 
+        {/* Students */}
         <div className="mt-10 space-y-6">
-                    {students.length === 0 ? (
+
+          {students.length === 0 ? (
 
             <div className="rounded-3xl border border-slate-800 bg-slate-900 p-10 text-center">
 
@@ -105,9 +101,7 @@ export default function VerifyStudent() {
               />
 
               <h2 className="mt-6 text-2xl font-bold">
-
                 No Students Found
-
               </h2>
 
             </div>
@@ -123,14 +117,11 @@ export default function VerifyStudent() {
 
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
 
-                  {/* Left */}
-
+                  {/* Student Information */}
                   <div>
 
                     <h2 className="text-2xl font-bold">
-
                       {student.fullName}
-
                     </h2>
 
                     <div className="mt-4 space-y-3">
@@ -143,9 +134,7 @@ export default function VerifyStudent() {
                         />
 
                         <span>
-
                           {student.email}
-
                         </span>
 
                       </div>
@@ -158,11 +147,8 @@ export default function VerifyStudent() {
                         />
 
                         <span>
-
-                          Student ID :
-                          {" "}
+                          Student ID:{" "}
                           {student.studentId || "N/A"}
-
                         </span>
 
                       </div>
@@ -171,8 +157,7 @@ export default function VerifyStudent() {
 
                   </div>
 
-                  {/* Right */}
-
+                  {/* Verification */}
                   <div className="flex flex-col items-end gap-5">
 
                     {student.isVerified ? (
@@ -193,9 +178,7 @@ export default function VerifyStudent() {
                         }
                         className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-3 font-semibold hover:scale-105 transition"
                       >
-
                         Verify Student
-
                       </button>
 
                     )}
@@ -210,11 +193,9 @@ export default function VerifyStudent() {
                         />
 
                         <span>
-
                           {student.isVerified
                             ? "Eligible To Vote"
                             : "Waiting Approval"}
-
                         </span>
 
                       </div>
@@ -236,7 +217,7 @@ export default function VerifyStudent() {
       </div>
 
     </div>
-
   );
-
 }
+
+export default VerifyStudent;

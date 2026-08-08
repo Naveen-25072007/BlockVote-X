@@ -1,22 +1,35 @@
 import express from "express";
 
-import { protect } from "../middleware/authMiddleware.js";
-
 import {
   getProfile,
   getAllStudents,
   verifyStudent,
 } from "../controllers/userController.js";
 
+import {
+  protect,
+  adminOnly,
+} from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
-// Logged-in User
+// Logged-in User Profile
 router.get("/profile", protect, getProfile);
 
-// Get All Students
-router.get("/students", protect, getAllStudents);
+// Admin - Get All Students
+router.get(
+  "/students",
+  protect,
+  adminOnly,
+  getAllStudents
+);
 
-// Verify Student
-router.put("/students/:id/verify", protect, verifyStudent);
+// Admin - Verify Student
+router.put(
+  "/students/:id/verify",
+  protect,
+  adminOnly,
+  verifyStudent
+);
 
 export default router;
